@@ -44,7 +44,7 @@ ORDERS = {
     "ord_99999": {
         "id": "ord_99999",
         "account_id": "acc_67890",
-        "symbol": "AAPL",
+        "symbol": "GOOG",
         "side": "BUY",
         "quantity": 10,
         "type": "MARKET",
@@ -55,7 +55,7 @@ ORDERS = {
 
 POSITIONS = {
     "acc_67890": [
-        {"symbol": "AAPL", "quantity": 10, "average_price": 150.00}
+        {"symbol": "GOOG", "quantity": 10, "average_price": 150.00}
     ]
 }
 
@@ -162,7 +162,7 @@ def place_order():
     new_order = {
         "id": new_ord_id,
         "account_id": account_id,
-        "symbol": data.get("symbol", "AAPL").upper(),
+        "symbol": data.get("symbol", "GOOG").upper(),
         "side": data.get("side", "BUY"),
         "quantity": data.get("quantity", 1),
         "type": data.get("type", "MARKET"),
