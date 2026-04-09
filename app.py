@@ -40,6 +40,25 @@ KYC_CHECKS = {
     }
 }
 
+ORDERS = {
+    "ord_99999": {
+        "id": "ord_99999",
+        "account_id": "acc_67890",
+        "symbol": "AAPL",
+        "side": "BUY",
+        "quantity": 10,
+        "type": "MARKET",
+        "status": "FILLED",
+        "created_at": "2023-10-27T10:30:00Z"
+    }
+}
+
+POSITIONS = {
+    "acc_67890": [
+        {"symbol": "AAPL", "quantity": 10, "average_price": 150.00}
+    ]
+}
+
 # 1. Create a User Profile (User Identity)
 @app.route('/v1/users', methods=['POST'])
 def create_user():
@@ -117,6 +136,78 @@ def update_account_configuration(account_id):
         account["configuration"]["options_level"] = data["options_level"]
         
     return jsonify(account), 200
+
+# --- APIs Outside the Core Team's Purview ---
+
+# 6. Retrieve Market Data Quote
+@app.route('/v1/market-data/quotes/<symbol>', methods=['GET'])
+def get_quote(symbol):
+    return jsonify({
+        "symbol": symbol.upper(),
+        "price": 150.25,
+        "bid": 150.20,
+        "ask": 150.30,
+        "timestamp": datetime.datetime.utcnow().isoformat() + "Z"
+    }), 200
+
+# 7. Submit a Trade Order
+@app.route('/v1/trading/orders', methods=['POST'])
+def place_order():
+    data = request.json or {}
+    account_id = data.get("account_id")
+    if not account_id or account_id not in ACCOUNTS:
+        return jsonify({"error": "Valid account_id is required"}), 400
+        
+    new_ord_id = f"ord_{uuid.uuid4().hex[:8]}"
+    new_order = {
+        "id": new_ord_id,
+        "account_id": account_id,
+        "symbol": data.get("symbol", "AAPL").upper(),
+        "side": data.get("side", "BUY"),
+        "quantity": data.get("quantity", 1),
+        "type": data.get("type", "MARKET"),
+        "status": "PENDING",
+        "created_at": datetime.datetime.utcnow().isoformat() + "Z"
+    }
+    ORDERS[new_ord_id] = new_order
+    return jsonify(new_order), 201
+
+# 8. Retrieve Order Status
+@app.route('/v1/trading/orders/<order_id>', methods=['GET'])
+def get_order(order_id):
+    order = ORDERS.get(order_id)
+    if order:
+        return jsonify(order), 200
+    return jsonify({"error": "Order not found"}), 404
+
+# 9. Get Account Positions
+@app.route('/v1/portfolio/<account_id>/positions', methods=['GET'])
+def get_positions(account_id):
+    if account_id not in ACCOUNTS:
+        return jsonify({"error": "Account not found"}), 404
+    positions = POSITIONS.get(account_id, [])
+    return jsonify({"account_id": account_id, "positions": positions}), 200
+
+# 10. Submit a Deposit
+@app.route('/v1/payments/deposits', methods=['POST'])
+def submit_deposit():
+    data = request.json or {}
+    account_id = data.get("account_id")
+    amount = data.get("amount")
+    if not account_id or account_id not in ACCOUNTS:
+        return jsonify({"error": "Valid account_id is required"}), 400
+    if not amount or amount <= 0:
+        return jsonify({"error": "Valid positive amount is required"}), 400
+        
+    deposit_id = f"dep_{uuid.uuid4().hex[:8]}"
+    deposit = {
+        "id": deposit_id,
+        "account_id": account_id,
+        "amount": amount,
+        "status": "PROCESSING",
+        "created_at": datetime.datetime.utcnow().isoformat() + "Z"
+    }
+    return jsonify(deposit), 202
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080)
