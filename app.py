@@ -140,7 +140,7 @@ def update_account_configuration(account_id):
     return jsonify(account), 200
 
 # 11. Retrieve Account Details
-@app.route('/v1/accounts/<account_id>', methods=['GET'])
+@app.route('/v2/accounts/<account_id>', methods=['GET'])
 def get_account(account_id):
     account = ACCOUNTS.get(account_id)
     if account:
@@ -221,7 +221,7 @@ def submit_deposit():
     return jsonify(deposit), 202
 
 # 12. Retrieve Deposit Status
-@app.route('/v1/payments/deposits/<deposit_id>', methods=['GET'])
+@app.route('/v2/payments/deposits/<deposit_id>', methods=['GET'])
 def get_deposit(deposit_id):
     deposit = DEPOSITS.get(deposit_id)
     if deposit:

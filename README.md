@@ -17,7 +17,7 @@ This service implements 10 endpoints to handle onboarding and broader platform f
    - Used to create a brokerage application or trading account linked to a specific user identity.
 5. **`PATCH /v1/accounts/{accountId}/configuration` (Account Configuration)**
    - Used to manage features on the account, such as updating margin settings, enabling options trading, or modifying associated risk limits.
-11. **`GET /v1/accounts/{accountId}` (Account Retrieval)**
+11. **`GET /v2/accounts/{accountId}` (Account Retrieval)**
     - Retrieves the details, status, and configuration of an existing brokerage account.
 
 ### Extended Domain APIs (Trading, Portfolio, Payments)
@@ -33,7 +33,7 @@ These endpoints represent capabilities normally handled by distinct groups:
    - Returns all open positions, holdings, and average prices for a specific account.
 10. **`POST /v1/payments/deposits` (Money Movement)**
     - Submits a cash deposit request to fund an individual brokerage account.
-12. **`GET /v1/payments/deposits/{depositId}` (Deposit Retrieval)**
+12. **`GET /v2/payments/deposits/{depositId}` (Deposit Retrieval)**
     - Used to fetch the status and details of a specific payment deposit.
 
 ## Implementation Details
