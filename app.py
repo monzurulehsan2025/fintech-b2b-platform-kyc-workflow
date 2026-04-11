@@ -59,6 +59,8 @@ POSITIONS = {
     ]
 }
 
+DEPOSITS = {}
+
 # 1. Create a User Profile (User Identity)
 @app.route('/v1/users', methods=['POST'])
 def create_user():
@@ -137,6 +139,14 @@ def update_account_configuration(account_id):
         
     return jsonify(account), 200
 
+# 11. Retrieve Account Details
+@app.route('/v2/accounts/<account_id>', methods=['GET'])
+def get_account(account_id):
+    account = ACCOUNTS.get(account_id)
+    if account:
+        return jsonify(account), 200
+    return jsonify({"error": "Account not found"}), 404
+
 # --- APIs Outside the Core Team's Purview ---
 
 # 6. Retrieve Market Data Quote
@@ -207,7 +217,16 @@ def submit_deposit():
         "status": "PROCESSING",
         "created_at": datetime.datetime.utcnow().isoformat() + "Z"
     }
+    DEPOSITS[deposit_id] = deposit
     return jsonify(deposit), 202
+
+# 12. Retrieve Deposit Status
+@app.route('/v2/payments/deposits/<deposit_id>', methods=['GET'])
+def get_deposit(deposit_id):
+    deposit = DEPOSITS.get(deposit_id)
+    if deposit:
+        return jsonify(deposit), 200
+    return jsonify({"error": "Deposit not found"}), 404
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080)
